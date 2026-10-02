@@ -15,31 +15,103 @@ format:
     - Understanding error messages and debugging
 - Be able to write and interpret the output of `R` code covering each of the above.
 
+::: {.callout-note}
+## Solutions
 
+This is the solutions version of the worksheet. Each task is followed by one worked solution; in most cases other correct answers are possible. We use the idiomatic `<-` for assignment throughout, though `=` also works.
+:::
 
 ## Part 1: R Fundamentals
 
 ### Tasks
 
-- [ ] Print "Hello World" to the console. 
-- [ ] Write a function that takes a name, and prints "Hello <name>" to the console.
-- [ ] Assign the value 42 to a variable called `answer`.
-- [ ] Create a numeric vector containing the numbers 1 through 5.
-- [ ] Create a numeric vector containing the numbers 1 through 1000.
-- [ ] Create a matrix with 10 rows and 10 columns filled with numbers 1 to 100.
-- [ ] Create a data frame with two columns: one called `name` containing three names, and one called `age` containing three ages.
-- [ ] Write a function that returns the square of its input.
-- [ ] Use a for loop to print the numbers 1 to 5.
-- [ ] Use a for loop to compute the mean of a numeric vector.
+- [x] Print "Hello World" to the console.
+- [x] Write a function that takes a name, and prints "Hello <name>" to the console.
+- [x] Assign the value 42 to a variable called `answer`.
+- [x] Create a numeric vector containing the numbers 1 through 5.
+- [x] Create a numeric vector containing the numbers 1 through 1000.
+- [x] Create a matrix with 10 rows and 10 columns filled with numbers 1 to 100.
+- [x] Create a data frame with two columns: one called `name` containing three names, and one called `age` containing three ages.
+- [x] Write a function that returns the square of its input.
+- [x] Use a for loop to print the numbers 1 to 5.
+- [x] Use a for loop to compute the mean of a numeric vector.
 
+```{r}
+# Print "Hello World"
+print("Hello World")
+
+# A function that greets a name
+greet <- function(name) {
+    cat("Hello", name, "\n")
+}
+greet("Ada")
+
+# Assign 42 to answer. The idiomatic operator is <-, but `answer = 42` works too.
+answer <- 42
+
+# Numeric vectors
+one_to_five <- 1:5
+one_to_thousand <- 1:1000
+
+# A 10x10 matrix filled with 1 to 100
+m <- matrix(1:100, nrow = 10, ncol = 10)
+
+# A data frame with names and ages
+df <- data.frame(
+    name = c("Ada", "Alan", "Grace"),
+    age = c(36, 41, 27)
+)
+
+# A function returning the square of its input
+square <- function(x) {
+    x^2
+}
+square(7)
+
+# A for loop printing 1 to 5
+for (i in 1:5) {
+    print(i)
+}
+
+# A for loop computing the mean of a numeric vector
+nums <- c(2, 4, 6, 8)
+total <- 0
+for (n in nums) {
+    total <- total + n
+}
+total / length(nums)
+```
 
 ## Part 1b: Lists
 
 Recall that a *list* can hold a mixture of types, and that lists turn up all over `R` — in particular, they are how a function returns several results at once, and how we store a collection of records.
 
-- [ ] A function can only return a single object, so when we want to return several results we bundle them into a list. Write a function `summarise_vector(x)` that returns a **named list** with the `mean`, `min`, `max`, and `n` (length) of a numeric vector `x`. Call it on `c(210, 217, 230, 205)` and use `$` to print just the mean from the result.
-- [ ] Call `str()` on the value your function returns to confirm its structure, then modify `summarise_vector` so that missing values are ignored (test it on a vector containing `NA`).
-- [ ] Below is a list of penguins, each itself a list. Using a `for` loop (or `sapply`), extract the `species` of every penguin into a character vector, and compute the mean flipper length across all of them.
+- [x] A function can only return a single object, so when we want to return several results we bundle them into a list. Write a function `summarise_vector(x)` that returns a **named list** with the `mean`, `min`, `max`, and `n` (length) of a numeric vector `x`. Call it on `c(210, 217, 230, 205)` and use `$` to print just the mean from the result.
+- [x] Call `str()` on the value your function returns to confirm its structure, then modify `summarise_vector` so that missing values are ignored (test it on a vector containing `NA`).
+
+```{r}
+# The `na.rm = TRUE` arguments handle the second part of the task: with them,
+# missing values are ignored by mean/min/max.
+summarise_vector <- function(x) {
+    list(
+        mean = mean(x, na.rm = TRUE),
+        min = min(x, na.rm = TRUE),
+        max = max(x, na.rm = TRUE),
+        n = length(x)
+    )
+}
+
+result <- summarise_vector(c(210, 217, 230, 205))
+result$mean
+
+# str() confirms the structure: a named list of four numbers
+str(result)
+
+# The na.rm = TRUE means NA values are ignored
+summarise_vector(c(210, 217, NA, 205))$mean
+```
+
+- [x] Below is a list of penguins, each itself a list. Using a `for` loop (or `sapply`), extract the `species` of every penguin into a character vector, and compute the mean flipper length across all of them.
 
 ```{r}
 penguins <- list(
@@ -49,23 +121,38 @@ penguins <- list(
 )
 ```
 
-- [ ] The function below is supposed to extract the name of every penguin. Examine its output on the two lists, `penguins` and `penguins2`. Why does it not return the expected values for `penguins2`? Fix the code so it correctly returns penguin names.
+```{r}
+# sapply is the concise way; it applies the function to each penguin and
+# simplifies the results to a vector.
+species <- sapply(penguins, function(p) p$species)
+species
+
+mean(sapply(penguins, function(p) p$flipper))
+```
+
+- [x] The function below is supposed to extract the name of every penguin. Examine its output on the two lists, `penguins` and `penguins2`. Why does it not return the expected values for `penguins2`? Fix the code so it correctly returns penguin names.
 
 ```{r}
-get_penguin_names <- function(penguins) {
-    sapply(penguins, function(penguin) penguin[[1]])
-}
-
 penguins2 <- list(
     list(name = "Flipper", species = "Adelie",  flipper = 210),
     list(species = "Gentoo", flipper = 217, name = "Tux"),
     list(flipper = 230, name = "Pingu", species = "Emperor")
 )
+```
+
+The original used `penguin[[1]]`, which accesses the element by **position**. That
+only works when `name` is the first element of every record, which is not the case
+in `penguins2`. Accessing by **name** with `penguin$name` (or `penguin[["name"]]`)
+is robust to the order in which the fields are stored.
+
+```{r}
+get_penguin_names <- function(penguins) {
+    sapply(penguins, function(penguin) penguin$name)
+}
 
 get_penguin_names(penguins)
 get_penguin_names(penguins2)
 ```
-
 
 ## Part 2: Advanced Array Indexing
 
@@ -93,15 +180,40 @@ vector <- 1:100
 
 Use elementwise indexing to display all elements in the vector that are:
 
-- [ ] $\leq$ 10
-- [ ] $>$ 90
-- [ ] $\leq 10$ or $> 90$ 
-- [ ] $> 10$ and $\leq 90$
-- [ ] Odd
-- [ ] (Advanced): Prime
+- [x] $\leq$ 10
+- [x] $>$ 90
+- [x] $\leq 10$ or $> 90$
+- [x] $> 10$ and $\leq 90$
+- [x] Odd
+- [x] (Advanced): Prime
 
-Hint: You will need to look up how to *combine* logical indexing statements and also some more *advanced* logical indexing statements.
-For the last task look at using `sapply`.
+Conditions are combined with `&` (and) and `|` (or) — note these are the
+*vectorised* versions, which act elementwise, unlike `&&` and `||`.
+
+```{r}
+vector[vector <= 10]
+vector[vector > 90]
+vector[vector <= 10 | vector > 90]
+vector[vector > 10 & vector <= 90]
+
+# Odd numbers: those with remainder 1 when divided by 2
+vector[vector %% 2 == 1]
+```
+
+For the primes, we write a helper that tests a single number, then use `sapply`
+to build a logical vector we can index with. A number is prime if it is at least
+2 and has no divisors other than 1 and itself.
+
+```{r}
+is_prime <- function(n) {
+    if (n < 2) return(FALSE)
+    if (n == 2) return(TRUE)
+    # TRUE if none of 2..(n-1) divide n exactly
+    !any(n %% 2:(n - 1) == 0)
+}
+
+vector[sapply(vector, is_prime)]
+```
 
 ## Part 3: Control Flow
 
@@ -123,9 +235,26 @@ students <- data.frame(
 )
 ```
 
-- [ ] Using `if_else`, add a new column `result` to `students` that is `"pass"` when the score is at least 40 and `"fail"` otherwise.
-- [ ] Using `case_when`, add a new column `grade` to `students` giving the classification: `"first"` (at least 70), `"2:1"` (at least 60), `"2:2"` (at least 50), `"third"` (at least 40), and `"fail"` otherwise. Remember that conditions are checked in order, so the most specific should come first.
-- [ ] Standard `if`/`else` statements make a single decision about a single value. Using `if`, `else if` and `else`, complete the stub function `is_leap_year` below so that it returns `TRUE` if `year` is a *leap year* and `FALSE` otherwise. The rule is:
+- [x] Using `if_else`, add a new column `result` to `students` that is `"pass"` when the score is at least 40 and `"fail"` otherwise.
+- [x] Using `case_when`, add a new column `grade` to `students` giving the classification: `"first"` (at least 70), `"2:1"` (at least 60), `"2:2"` (at least 50), `"third"` (at least 40), and `"fail"` otherwise. Remember that conditions are checked in order, so the most specific should come first.
+
+```{r}
+students$result <- if_else(students$score >= 40, "pass", "fail")
+
+# Conditions are checked top to bottom, so the highest thresholds come first.
+# TRUE acts as the catch-all "else" branch.
+students$grade <- case_when(
+    students$score >= 70 ~ "first",
+    students$score >= 60 ~ "2:1",
+    students$score >= 50 ~ "2:2",
+    students$score >= 40 ~ "third",
+    TRUE ~ "fail"
+)
+
+students
+```
+
+- [x] Standard `if`/`else` statements make a single decision about a single value. Using `if`, `else if` and `else`, complete the stub function `is_leap_year` below so that it returns `TRUE` if `year` is a *leap year* and `FALSE` otherwise. The rule is:
     - if `year` is divisible by 400, it is a leap year;
     - otherwise, if `year` is divisible by 100, it is *not* a leap year;
     - otherwise, if `year` is divisible by 4, it is a leap year;
@@ -142,12 +271,20 @@ The modulo operator `%%` gives the remainder of a division, so `year %% 400 == 0
 :::
 
 ```{r}
-#| error: TRUE
+# The order of the branches matches the rule: 400 first, then 100, then 4.
 is_leap_year <- function(year) {
-    FALSE # Replace with correct code.
+    if (year %% 400 == 0) {
+        TRUE
+    } else if (year %% 100 == 0) {
+        FALSE
+    } else if (year %% 4 == 0) {
+        TRUE
+    } else {
+        FALSE
+    }
 }
 
-# Self-check: should run without error once is_leap_year is correct
+# Self-check: runs without error now that is_leap_year is correct
 stopifnot(
     is_leap_year(2000) == TRUE,   # divisible by 400
     is_leap_year(2024) == TRUE,   # divisible by 4, not by 100
@@ -158,7 +295,7 @@ stopifnot(
 
 ### Part (b): Loops
 
-- [ ] In the next block, write a function that uses a for loop to print a message if an input vector contains NA values. Test it on the five variables supplied below.
+- [x] In the next block, write a function that uses a for loop to print a message if an input vector contains NA values. Test it on the five variables supplied below.
 
 ```{r}
 vec1 <- 1:10
@@ -168,42 +305,94 @@ vec4 <- "This is not a vector"
 vec5 <- matrix(c(1,2,3,4,NA,6), nrow=2, ncol=3)
 ```
 
-- [ ] In a new chunk, write a function called `make_square` that, given an integer, will print a square of full stops with side length that integer. Here are some examples:
+```{r}
+# Looping over the elements and checking each with is.na(). We return as soon as
+# we find one, so the message is printed at most once.
+check_for_na <- function(v) {
+    for (element in v) {
+        if (is.na(element)) {
+            cat("The vector contains NA values.\n")
+            return(invisible())
+        }
+    }
+    cat("No NA values found.\n")
+}
 
-```r
-make_square(3)
-
-# expected output:
-...
-. .
-...
-
-make_square(5)
-
-# expected output:
-.....
-.   .
-.   .
-.   .
-.....
+check_for_na(vec1)
+check_for_na(vec2)
+check_for_na(vec3)  # empty: the loop body never runs, so "No NA values found."
+check_for_na(vec4)
+check_for_na(vec5)  # a matrix is a vector under the hood, so this works too
 ```
 
-- [ ] (Advanced): Look up *while loops* in `R`. Write a function that uses a while loop to simulate a particle undergoing a *random walk* in 1D. Starting from 0, in each iteration, the particle either takes a step $x \mapsto x + 1$ or $x \mapsto x - 1$, uniformly at random. Terminate the walk when the particle reaches either -10 or +10, and print where it ended up and how many steps it took.
-- [ ] (Advanced): Run your function from above multiple times. Display how often the particle ended at -10 and how often it ended at +10. Make sure that your results do not change if the worksheet is run multiple times!
+- [x] In a new chunk, write a function called `make_square` that, given an integer, will print a square of full stops with side length that integer.
+
+```{r}
+# The first and last rows are solid; the rows in between have a dot at each end
+# and spaces in the middle. strrep() repeats a string a given number of times.
+make_square <- function(n) {
+    for (i in 1:n) {
+        if (i == 1 || i == n) {
+            cat(strrep(".", n), "\n", sep = "")
+        } else {
+            cat(".", strrep(" ", n - 2), ".", "\n", sep = "")
+        }
+    }
+}
+
+make_square(3)
+make_square(5)
+```
+
+- [x] (Advanced): Look up *while loops* in `R`. Write a function that uses a while loop to simulate a particle undergoing a *random walk* in 1D. Terminate the walk when the particle reaches either -10 or +10, and print where it ended up and how many steps it took.
+- [x] (Advanced): Run your function from above multiple times. Display how often the particle ended at -10 and how often it ended at +10. Make sure that your results do not change if the worksheet is run multiple times!
 
 ::: {.callout-tip}
 Your random walk uses randomly generated numbers, so it will produce different output every time the document is rendered. To make results *reproducible* — the same every time — look up `set.seed()` and call it once at the start of the chunk. We will return to why this matters for reproducibility later in the course.
 :::
 
+```{r}
+# sample(c(-1, 1), 1) picks one of -1 or +1 with equal probability.
+# The while loop continues as long as the particle is strictly inside (-10, 10).
+random_walk <- function() {
+    x <- 0
+    steps <- 0
+    while (x > -10 && x < 10) {
+        x <- x + sample(c(-1, 1), 1)
+        steps <- steps + 1
+    }
+    list(end = x, steps = steps)
+}
+
+# set.seed makes the "random" numbers reproducible: the same every render.
+set.seed(42)
+
+walk <- random_walk()
+cat("The particle ended at", walk$end, "after", walk$steps, "steps.\n")
+
+# Run it many times and tabulate where it ended up. By symmetry the two
+# outcomes should be roughly equally likely.
+ends <- sapply(1:1000, function(i) random_walk()$end)
+table(ends)
+```
+
 ## Part 4: Pipes
 
 The *pipe* operator `|>` passes the value on its left into the first argument of the function on its right. Chaining pipes lets a sequence of nested function calls be read left-to-right, in the order they actually happen, rather than inside-out.
 
-- [ ] Rewrite the nested expression below using `|>`, so that it reads as a left-to-right pipeline. Check that your piped version gives the same answer. (Note that the last call takes an extra argument — recall that the piped value fills only the *first* argument of each function.)
+- [x] Rewrite the nested expression below using `|>`, so that it reads as a left-to-right pipeline. Check that your piped version gives the same answer. (Note that the last call takes an extra argument — recall that the piped value fills only the *first* argument of each function.)
 
 ```{r}
 x <- c(4, 9, 16, 25)
 round(mean(sqrt(x)), 1)
+```
+
+Reading the nested call from the inside out, we take `sqrt`, then `mean`, then
+`round`. The pipe lets us write that in the same order. The `1` becomes the
+*second* argument of `round`, since the piped value fills the first.
+
+```{r}
+x |> sqrt() |> mean() |> round(1)
 ```
 
 ## Part 5: Debugging
@@ -214,37 +403,64 @@ Then, feed the problem into an LLM and see whether it comes up with the same sol
 
 ### Tasks
 
-- [ ] Modify the below code to return the row sums of only the non-NA values.
+- [x] Modify the below code to return the row sums of only the non-NA values.
 
 ```{r}
 # A data frame with some missing values
 df <- data.frame(a = c(1, 2, 3, NA, 5), b = c(10, NA, 30, 40, 50))
+```
 
-# Compute row-wise sums
-row_sums <- apply(df, 1, sum)
+`apply(df, 1, sum)` returns `NA` for any row containing an `NA`, because
+`sum()` propagates missing values by default. Passing `na.rm = TRUE` (which
+`apply` forwards to `sum`) ignores them instead.
 
+```{r}
+row_sums <- apply(df, 1, sum, na.rm = TRUE)
 print(row_sums)
 ```
 
-- [ ] Given two vectors `x` and `y` of the same length, the below code prints out the (Euclidean) distance between `x` and `y`, but for some reason it is printing a distance between vectors that are not of the same length. Correct the code.
+- [x] Given two vectors `x` and `y` of the same length, the below code prints out the (Euclidean) distance between `x` and `y`, but for some reason it is printing a distance between vectors that are not of the same length. Correct the code.
+
+The problem is *recycling*: when `x` and `y` have different lengths, `R`
+silently repeats the shorter one to match the longer (here `b` becomes
+`c(5, 6, 5, 6)`), so `x - y` computes something meaningless without complaint.
+The fix is a guard clause that stops with a clear error when the lengths differ,
+rather than returning a wrong answer.
 
 ```{r}
+#| error: true
 distance <- function(x, y) {
-    return(norm(x - y, type="2"))
+    if (length(x) != length(y)) {
+        stop("x and y must be the same length")
+    }
+    norm(x - y, type = "2")
 }
+
 a <- c(1, 2, 3, 4)
 b <- c(5, 6)
 
-result <- distance(a, b)
-print(result)
+# This now raises a clear error instead of silently recycling:
+distance(a, b)
 ```
 
-- [ ] The below code prints out "values are equal" if `a` and `b` are equal, but for some reason it is not working for these example values. Correct the code.
+```{r}
+# On vectors of equal length it works as intended:
+distance(c(1, 2, 3, 4), c(5, 6, 7, 8))
+```
+
+- [x] The below code prints out "values are equal" if `a` and `b` are equal, but for some reason it is not working for these example values. Correct the code.
+
+Because doubles are stored to finite precision, `0.1 + 0.2` is not *exactly*
+`0.3`, so `==` returns `FALSE`. Comparing with `all.equal()`, which allows a
+tiny tolerance, gives the intended result. We wrap it in `isTRUE()` because
+`all.equal()` returns a *message* rather than `FALSE` when the values differ,
+which would not behave correctly inside `if`.
+
 ```{r}
 a <- 0.1 + 0.2
 b <- 0.3
 
-if(a == b) {
+if (isTRUE(all.equal(a, b))) {
     print("Values are equal.")
 } else {
     print("Values are not equal.")
@@ -253,11 +469,19 @@ if(a == b) {
 
 Hint: see the [Assignments and Types](https://soton-fds.github.io/week02.html#assignments-and-types) section of the notes.
 
-- [ ] The below returns the entries of `vec1` for which `vec2 == "y"`. So why does `subset` contain an `NA`? Fix the code.
+- [x] The below returns the entries of `vec1` for which `vec2 == "y"`. So why does `subset` contain an `NA`? Fix the code.
 
 ```{r}
 vec1 <- 1:5
 vec2 <- c("x", "y", NA, "x", "y")
-subset <- vec1[vec2 == "y"]
+```
+
+The comparison `vec2 == "y"` is `NA` wherever `vec2` is `NA` (an unknown value
+is not known to equal `"y"`), and indexing a vector with `NA` yields an `NA`
+element. Using `which()` returns only the positions that are `TRUE`, discarding
+the `NA`; equivalently we could write `vec2 == "y" & !is.na(vec2)`.
+
+```{r}
+subset <- vec1[which(vec2 == "y")]
 subset
 ```
